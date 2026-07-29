@@ -27,6 +27,12 @@
 
 前往 [QQ 机器人开放平台](https://q.qq.com/) 创建机器人，获取 `AppId` 和 `Secret`。
 
+安装POPYBot.Core
+
+```bash
+dotnet add package POPYBot.Core
+```
+
 ### 2. 配置 config.json
 
 在可执行程序同目录下创建 `config.json`：
