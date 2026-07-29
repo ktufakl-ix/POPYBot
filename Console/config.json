@@ -1,0 +1,9 @@
+{
+  "AppId": "YOUR_APP_ID",
+  "Secret": "YOUR_SECRET",
+  "IsSandbox": false,
+  "Timeout": 5,
+  "LogLevel": "Information",
+  "Intents": "PublicGuildMessages,DirectMessage",
+  "PluginsPath": null
+}
