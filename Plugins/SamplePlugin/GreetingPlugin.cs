@@ -13,8 +13,8 @@ public class GreetingPlugin : IBotPlugin
     {
         _context = context;
 
-        // Register hook for @ message events
-        context.Hooks.On(HookEvents.AtMessageCreate, async (Message message) =>
+        // Subscribe via += syntax (strongly typed, IDE auto-complete)
+        context.Hooks.OnAtMessageCreate += async (Message message) =>
         {
             Logger.LogInfo($"[{Name}] Received @ message from {message.Author?.Username}: {message.Content}");
 
@@ -22,10 +22,9 @@ public class GreetingPlugin : IBotPlugin
             {
                 await message.Reply(content: $"Hello! I'm '{Name}' v{Version}.");
             }
-        });
+        };
 
-        // Register hook for group message events (needs GROUP_MESSAGE_CREATE intent)
-        context.Hooks.On(HookEvents.GroupMessageCreate, async (GroupMessage msg) =>
+        context.Hooks.OnGroupMessageCreate += async (GroupMessage msg) =>
         {
             Logger.LogInfo($"[{Name}] Received group message from {msg.Author?.MemberOpenid}: {msg.Content}");
 
@@ -33,19 +32,18 @@ public class GreetingPlugin : IBotPlugin
             {
                 await msg.Reply(content: "pong!");
             }
-        });
+        };
 
-        // Register hook for group member join events
-        context.Hooks.On(HookEvents.GroupMemberAdd, async (GroupManageEvent ev) =>
+        context.Hooks.OnGroupMemberAdd += async (GroupManageEvent ev) =>
         {
             Logger.LogInfo($"[{Name}] New member joined group {ev.GroupOpenid}");
-        });
+        };
 
-        context.Hooks.On(HookEvents.Ready, () =>
+        context.Hooks.OnReady += () =>
         {
             Logger.LogInfo($"[{Name}] Bot is ready!");
             return Task.CompletedTask;
-        });
+        };
 
         Logger.LogInfo($"[{Name}] Plugin initialized");
         return Task.CompletedTask;

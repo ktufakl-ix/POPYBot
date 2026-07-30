@@ -150,14 +150,17 @@ public class HelloPlugin : IBotPlugin
     {
         _ctx = context;
 
-        // 注册 @消息 Hook
-        context.Hooks.On(HookEvents.AtMessageCreate, async (Message message) =>
+        // 方式一：+= 强类型事件（推荐，IDE 自动补全）
+        context.Hooks.OnAtMessageCreate += async (Message message) =>
         {
             if (message.Content == "/hello")
             {
                 await message.Reply(content: "你好世界！");
             }
-        });
+        };
+
+        // 方式二：字符串注册（兼容动态/自定义事件名）
+        // context.Hooks.On(HookEvents.AtMessageCreate, handler);
 
         Logger.LogInfo($"[{Name}] 插件初始化完成");
         return Task.CompletedTask;
@@ -314,11 +317,11 @@ public Task InitializeAsync(IPluginContext context)
     var api = context.Api;
 
     // 获取频道信息
-    context.Hooks.On(HookEvents.GuildCreate, async (Guild guild) =>
+    context.Hooks.OnGuildCreate += async (Guild guild) =>
     {
         var channels = await api.GetChannelsAsync<JsonElement>(guild.Id!);
         Logger.LogInfo($"频道 {guild.Name} 有子频道");
-    });
+    };
 
     // 发送主动消息（无需消息上下文）
     // await api.PostMessageAsync(channelId, msgId, content: "主动消息");
@@ -380,14 +383,14 @@ private Delegate? _handler;
 public Task InitializeAsync(IPluginContext context)
 {
     _handler = async (Message message) => { /* ... */ };
-    context.Hooks.On(HookEvents.AtMessageCreate, _handler);
+    context.Hooks.OnAtMessageCreate += (Func<Message, Task>)_handler;
     return Task.CompletedTask;
 }
 
 // 需要时注销
 public void DisableFeature()
 {
-    _ctx?.Hooks.Off(HookEvents.AtMessageCreate, _handler!);
+    _ctx?.Hooks.OnAtMessageCreate -= (Func<Message, Task>)_handler!;
 }
 ```
 
