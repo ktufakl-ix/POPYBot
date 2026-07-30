@@ -127,63 +127,10 @@ POPYBot 的插件系统基于 **DLL 动态加载 + Hook 注册** 模式。每个
 # 在 Plugins 目录下创建类库项目
 dotnet new classlib -n HelloPlugin -o Plugins/HelloPlugin
 ```
-
-然后编辑 `Plugins/HelloPlugin/HelloPlugin.csproj`，添加对 Core 项目的引用（Core 由宿主加载，设为 `Private="false"`）：
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <AssemblyName>HelloPlugin</AssemblyName>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <!-- 引用 Core 项目；Private=false 表示不复制 Core.dll 到插件输出 -->
-    <ProjectReference Include="..\..\Core\POPYBot.Core.csproj" Private="false" />
-  </ItemGroup>
-
-</Project>
-```
-
-> **注意**：`Plugins/Directory.Build.props` 已统一设置 `TargetFramework`、`ImplicitUsings`、`Nullable`，且 **默认关闭了依赖 DLL 复制**。插件项目只需配置 `AssemblyName` 和 `ProjectReference` 即可。
-
-#### 2. 使用外部 NuGet 依赖（可选）
-
-如果插件需要宿主未加载的第三方库，有两种方式：
-
-**方式 A：嵌入为资源（推荐）**
-
-```xml
-<!-- 在插件 .csproj 中添加 -->
-<ItemGroup>
-  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-</ItemGroup>
-
-<!-- 编译后将依赖 DLL 嵌入为托管资源 -->
-<Target Name="EmbedDeps" AfterTargets="Build">
-  <ItemGroup>
-    <DepFiles Include="$(OutputPath)*.dll" 
-              Exclude="$(OutputPath)$(AssemblyName).dll;$(OutputPath)POPYBot.Core.*;$(OutputPath)System.*;$(OutputPath)Microsoft.*" />
-  </ItemGroup>
-  <Copy SourceFiles="@(DepFiles)" DestinationFolder="$(IntermediateOutputPath)embed\" SkipUnchangedFiles="true" />
-  <ItemGroup>
-    <EmbeddedResource Include="$(IntermediateOutputPath)embed\*.dll" />
-  </ItemGroup>
-</Target>
-```
-
-`PluginLoadContext` 会自动从插件 DLL 的嵌入资源中加载依赖程序集。
-
-**方式 B：ILPack 合并**
-
-使用 [dotnet-ilrepack](https://github.com/gluck/il-repack) 工具将依赖 DLL 合并到插件 DLL：
-
 ```bash
-dotnet tool install -g dotnet-ilrepack
-dotnet ilrepack /out:merged/HelloPlugin.dll bin/Release/net10.0/HelloPlugin.dll bin/Release/net10.0/Newtonsoft.Json.dll
+# 安装依赖
+dotnet add package POPYBot.Core
 ```
-
-无论哪种方式，输出都是**单个 DLL 文件**。
 
 #### 3. 实现 IBotPlugin
 
