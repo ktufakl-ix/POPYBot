@@ -1,15 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <AssemblyName>SamplePlugin</AssemblyName>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\POPYBot.Core.csproj" />
+    <!-- Core is loaded by the host; don't copy to plugin output -->
+    <ProjectReference Include="..\..\Core\POPYBot.Core.csproj" Private="false" />
   </ItemGroup>
 
 </Project>

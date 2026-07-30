@@ -168,8 +168,9 @@ public class Client : IAsyncDisposable
         // Invoke plugin hooks
         _ = _hookManager?.InvokeAsync(eventName, data);
 
-        // Invoke Client virtual methods
-        var methodInfo = GetType().GetMethod("On" + eventName.Replace("_", "").Replace(" ", ""),
+        // Invoke Client virtual methods (convert snake_case to PascalCase)
+        var methodName = "On" + SnakeToPascalCase(eventName);
+        var methodInfo = GetType().GetMethod(methodName,
             System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
 
         if (methodInfo != null)
@@ -188,13 +189,24 @@ public class Client : IAsyncDisposable
         }
         else
         {
-            Logger.LogDebug($"[botpy] Event {eventName} not registered");
+            Logger.LogDebug($"[botpy] No virtual override for: {methodName} (event: {eventName})");
         }
+    }
+
+    private static string SnakeToPascalCase(string snakeCase)
+    {
+        var pascal = string.Concat(snakeCase.Split('_', StringSplitOptions.RemoveEmptyEntries)
+            .Select(part => part.Length > 0 ? char.ToUpperInvariant(part[0]) + part[1..] : ""));
+
+        // Fix known acronyms that should stay uppercase
+        return pascal
+            .Replace("C2c", "C2C");
     }
 
     // ========== Virtual event handlers that users override ==========
 
     public virtual Task OnReady() => Task.CompletedTask;
+    public virtual Task OnResumed() => Task.CompletedTask;
     public virtual Task OnError(string eventMethod, Exception ex) => Task.CompletedTask;
 
     // Guild events
@@ -234,14 +246,17 @@ public class Client : IAsyncDisposable
     // Audio events
     public virtual Task OnAudioStart(Models.Audio audio) => Task.CompletedTask;
     public virtual Task OnAudioFinish(Models.Audio audio) => Task.CompletedTask;
-    public virtual Task OnMic(Models.Audio audio) => Task.CompletedTask;
-    public virtual Task OffMic(Models.Audio audio) => Task.CompletedTask;
+    public virtual Task OnAudioOnMic(Models.Audio audio) => Task.CompletedTask;
+    public virtual Task OnAudioOffMic(Models.Audio audio) => Task.CompletedTask;
 
     // Public group/C2C events
     public virtual Task OnGroupAtMessageCreate(Models.GroupMessage message) => Task.CompletedTask;
+    public virtual Task OnGroupMessageCreate(Models.GroupMessage message) => Task.CompletedTask;
     public virtual Task OnC2CMessageCreate(Models.C2CMessage message) => Task.CompletedTask;
     public virtual Task OnGroupAddRobot(Models.GroupManageEvent ev) => Task.CompletedTask;
     public virtual Task OnGroupDelRobot(Models.GroupManageEvent ev) => Task.CompletedTask;
+    public virtual Task OnGroupMemberAdd(Models.GroupManageEvent ev) => Task.CompletedTask;
+    public virtual Task OnGroupMemberRemove(Models.GroupManageEvent ev) => Task.CompletedTask;
     public virtual Task OnGroupMsgReject(Models.GroupManageEvent ev) => Task.CompletedTask;
     public virtual Task OnGroupMsgReceive(Models.GroupManageEvent ev) => Task.CompletedTask;
     public virtual Task OnFriendAdd(Models.C2CManageEvent ev) => Task.CompletedTask;

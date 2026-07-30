@@ -143,8 +143,8 @@ public class ConnectionState
 
         Parsers["audio_start"] = (msg) => _dispatch("audio_start", new Audio(_api, msg.TryGetString("id"), ParseData(msg)));
         Parsers["audio_finish"] = (msg) => _dispatch("audio_finish", new Audio(_api, msg.TryGetString("id"), ParseData(msg)));
-        Parsers["on_mic"] = (msg) => _dispatch("on_mic", new Audio(_api, msg.TryGetString("id"), ParseData(msg)));
-        Parsers["off_mic"] = (msg) => _dispatch("off_mic", new Audio(_api, msg.TryGetString("id"), ParseData(msg)));
+        Parsers["audio_on_mic"] = (msg) => _dispatch("audio_on_mic", new Audio(_api, msg.TryGetString("id"), ParseData(msg)));
+        Parsers["audio_off_mic"] = (msg) => _dispatch("audio_off_mic", new Audio(_api, msg.TryGetString("id"), ParseData(msg)));
 
         Parsers["at_message_create"] = (msg) =>
         {
@@ -162,6 +162,11 @@ public class ConnectionState
             var payload = Deserialize<GroupMessagePayload>(msg.GetProperty("d"));
             _dispatch("group_at_message_create", new GroupMessage(_api, msg.TryGetString("id"), payload));
         };
+        Parsers["group_message_create"] = (msg) =>
+        {
+            var payload = Deserialize<GroupMessagePayload>(msg.GetProperty("d"));
+            _dispatch("group_message_create", new GroupMessage(_api, msg.TryGetString("id"), payload));
+        };
         Parsers["c2c_message_create"] = (msg) =>
         {
             var payload = Deserialize<MessagePayload>(msg.GetProperty("d"));
@@ -172,6 +177,8 @@ public class ConnectionState
         Parsers["group_del_robot"] = (msg) => _dispatch("group_del_robot", new GroupManageEvent(_api, msg.TryGetString("id"), ParseData(msg)));
         Parsers["group_msg_reject"] = (msg) => _dispatch("group_msg_reject", new GroupManageEvent(_api, msg.TryGetString("id"), ParseData(msg)));
         Parsers["group_msg_receive"] = (msg) => _dispatch("group_msg_receive", new GroupManageEvent(_api, msg.TryGetString("id"), ParseData(msg)));
+        Parsers["group_member_add"] = (msg) => _dispatch("group_member_add", new GroupManageEvent(_api, msg.TryGetString("id"), ParseData(msg)));
+        Parsers["group_member_remove"] = (msg) => _dispatch("group_member_remove", new GroupManageEvent(_api, msg.TryGetString("id"), ParseData(msg)));
 
         Parsers["friend_add"] = (msg) => _dispatch("friend_add", new C2CManageEvent(_api, msg.TryGetString("id"), ParseData(msg)));
         Parsers["friend_del"] = (msg) => _dispatch("friend_del", new C2CManageEvent(_api, msg.TryGetString("id"), ParseData(msg)));

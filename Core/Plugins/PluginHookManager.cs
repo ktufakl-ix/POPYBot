@@ -79,15 +79,18 @@ public static class HookEvents
 
     public const string AudioStart = "audio_start";
     public const string AudioFinish = "audio_finish";
-    public const string OnMic = "on_mic";
-    public const string OffMic = "off_mic";
+    public const string AudioOnMic = "audio_on_mic";
+    public const string AudioOffMic = "audio_off_mic";
 
     public const string GroupAtMessageCreate = "group_at_message_create";
+    public const string GroupMessageCreate = "group_message_create";
     public const string C2CMessageCreate = "c2c_message_create";
     public const string GroupAddRobot = "group_add_robot";
     public const string GroupDelRobot = "group_del_robot";
     public const string GroupMsgReject = "group_msg_reject";
     public const string GroupMsgReceive = "group_msg_receive";
+    public const string GroupMemberAdd = "group_member_add";
+    public const string GroupMemberRemove = "group_member_remove";
     public const string FriendAdd = "friend_add";
     public const string FriendDel = "friend_del";
     public const string C2CMsgReject = "c2c_msg_reject";

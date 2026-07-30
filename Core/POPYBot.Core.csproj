@@ -8,7 +8,7 @@
     <AssemblyName>POPYBot.Core</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>POPYBot.Core</Title>
-    <Version>1.0.3</Version>
+    <Version>1.0.5</Version>
     <Authors>ktufakl</Authors>
     <Description>C#的QQ官方bot适配器</Description>
     <PackageProjectUrl>https://github.com/ktufakl-ix/POPYBot</PackageProjectUrl>

@@ -1,0 +1,10 @@
+<Project>
+  <!-- Clean up any stale dependency DLLs in output (from old builds) -->
+  <Target Name="CleanStaleDeps" AfterTargets="Build">
+    <ItemGroup>
+      <_StaleDeps Include="$(OutputPath)*.dll"
+                  Exclude="$(OutputPath)$(AssemblyName).dll;$(OutputPath)POPYBot.Core.*" />
+    </ItemGroup>
+    <Delete Files="@(_StaleDeps)" Condition="Exists('%(FullPath)')" />
+  </Target>
+</Project>

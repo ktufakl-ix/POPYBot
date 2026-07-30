@@ -21,10 +21,12 @@
   <Target Name="CopyPlugins" AfterTargets="Build">
     <MakeDir Directories="$(OutputPath)plugins" Condition="!Exists('$(OutputPath)plugins')" />
     <ItemGroup>
-      <SamplePluginFiles Include="..\Plugins\SamplePlugin\bin\$(Configuration)\net10.0\SamplePlugin.dll" />
+      <PluginFiles Include="..\Plugins\*\bin\$(Configuration)\net10.0\*.dll"
+                   Exclude="..\Plugins\*\bin\$(Configuration)\net10.0\POPYBot.Core.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(SamplePluginFiles)" DestinationFolder="$(OutputPath)plugins" Condition="Exists('%(FullPath)')" SkipUnchangedFiles="true" />
-    <Message Text="[POPYBot] Plugin DLLs copied to $(OutputPath)plugins" Importance="low" />
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(OutputPath)plugins"
+          Condition="Exists('%(FullPath)')" SkipUnchangedFiles="true" />
+    <Message Text="[POPYBot] Copied @(PluginFiles-&gt;Count()) plugin DLL(s) to $(OutputPath)plugins" Importance="high" />
   </Target>
 
 </Project>

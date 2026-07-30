@@ -124,12 +124,68 @@ POPYBot 的插件系统基于 **DLL 动态加载 + Hook 注册** 模式。每个
 #### 1. 创建插件项目
 
 ```bash
+# 在 Plugins 目录下创建类库项目
 dotnet new classlib -n HelloPlugin -o Plugins/HelloPlugin
-cd Plugins/HelloPlugin
-dotnet add package POPYBot.Core
 ```
 
-#### 2. 实现 IBotPlugin
+然后编辑 `Plugins/HelloPlugin/HelloPlugin.csproj`，添加对 Core 项目的引用（Core 由宿主加载，设为 `Private="false"`）：
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>HelloPlugin</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 引用 Core 项目；Private=false 表示不复制 Core.dll 到插件输出 -->
+    <ProjectReference Include="..\..\Core\POPYBot.Core.csproj" Private="false" />
+  </ItemGroup>
+
+</Project>
+```
+
+> **注意**：`Plugins/Directory.Build.props` 已统一设置 `TargetFramework`、`ImplicitUsings`、`Nullable`，且 **默认关闭了依赖 DLL 复制**。插件项目只需配置 `AssemblyName` 和 `ProjectReference` 即可。
+
+#### 2. 使用外部 NuGet 依赖（可选）
+
+如果插件需要宿主未加载的第三方库，有两种方式：
+
+**方式 A：嵌入为资源（推荐）**
+
+```xml
+<!-- 在插件 .csproj 中添加 -->
+<ItemGroup>
+  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+</ItemGroup>
+
+<!-- 编译后将依赖 DLL 嵌入为托管资源 -->
+<Target Name="EmbedDeps" AfterTargets="Build">
+  <ItemGroup>
+    <DepFiles Include="$(OutputPath)*.dll" 
+              Exclude="$(OutputPath)$(AssemblyName).dll;$(OutputPath)POPYBot.Core.*;$(OutputPath)System.*;$(OutputPath)Microsoft.*" />
+  </ItemGroup>
+  <Copy SourceFiles="@(DepFiles)" DestinationFolder="$(IntermediateOutputPath)embed\" SkipUnchangedFiles="true" />
+  <ItemGroup>
+    <EmbeddedResource Include="$(IntermediateOutputPath)embed\*.dll" />
+  </ItemGroup>
+</Target>
+```
+
+`PluginLoadContext` 会自动从插件 DLL 的嵌入资源中加载依赖程序集。
+
+**方式 B：ILPack 合并**
+
+使用 [dotnet-ilrepack](https://github.com/gluck/il-repack) 工具将依赖 DLL 合并到插件 DLL：
+
+```bash
+dotnet tool install -g dotnet-ilrepack
+dotnet ilrepack /out:merged/HelloPlugin.dll bin/Release/net10.0/HelloPlugin.dll bin/Release/net10.0/Newtonsoft.Json.dll
+```
+
+无论哪种方式，输出都是**单个 DLL 文件**。
+
+#### 3. 实现 IBotPlugin
 
 ```csharp
 using POPYBot;
@@ -168,12 +224,18 @@ public class HelloPlugin : IBotPlugin
 }
 ```
 
-#### 3. 编译并部署
+#### 4. 编译并部署
 
 ```bash
 dotnet build -c Release
-# 将 bin/Release/net10.0/HelloPlugin.dll 复制到运行目录的 plugins/ 文件夹
 ```
+
+编译后 `bin/Release/net10.0/` 下只有 **3 个文件**：
+- `HelloPlugin.dll` — 插件本体（仅此一个 DLL，含嵌入依赖）
+- `HelloPlugin.deps.json` — 依赖清单（调试用）
+- `HelloPlugin.pdb` — 调试符号
+
+将 `HelloPlugin.dll` 复制到宿主程序的 `plugins/` 目录即可。宿主会自动扫描并加载。
 
 ---
 
@@ -216,9 +278,12 @@ dotnet build -c Release
 | HookEvents 常量 | 数据模型 | 说明 |
 |---|---|---|
 | `GroupAtMessageCreate` | `GroupMessage` | 群 @机器人消息 |
+| `GroupMessageCreate` | `GroupMessage` | 群聊全量消息（需申请权限） |
 | `C2CMessageCreate` | `C2CMessage` | 单聊消息 |
 | `GroupAddRobot` | `GroupManageEvent` | 机器人加入群 |
 | `GroupDelRobot` | `GroupManageEvent` | 机器人退出群 |
+| `GroupMemberAdd` | `GroupManageEvent` | 群成员加入 |
+| `GroupMemberRemove` | `GroupManageEvent` | 群成员移出 |
 | `FriendAdd` | `C2CManageEvent` | 好友添加 |
 | `FriendDel` | `C2CManageEvent` | 好友删除 |
 
@@ -238,8 +303,8 @@ dotnet build -c Release
 | `MessageAuditReject` | `MessageAudit` | 消息审核不通过 |
 | `AudioStart` | `Audio` | 音频开始 |
 | `AudioFinish` | `Audio` | 音频结束 |
-| `OnMic` | `Audio` | 上麦 |
-| `OffMic` | `Audio` | 下麦 |
+| `AudioOnMic` | `Audio` | 上麦 |
+| `AudioOffMic` | `Audio` | 下麦 |
 | `ForumThreadCreate/Update/Delete` | `Thread` | 论坛帖子事件 |
 | `ForumPostCreate/Delete` | `Dictionary` | 论坛回帖事件 |
 | `OpenForumThreadCreate` 等 | `OpenThread` | 开放论坛事件 |

@@ -13,15 +13,32 @@ public class GreetingPlugin : IBotPlugin
     {
         _context = context;
 
-        // Register hook for @ message events - data is a Message object
+        // Register hook for @ message events
         context.Hooks.On(HookEvents.AtMessageCreate, async (Message message) =>
         {
-            Logger.LogInfo($"[{Name}] Received message from {message.Author?.Username}: {message.Content}");
+            Logger.LogInfo($"[{Name}] Received @ message from {message.Author?.Username}: {message.Content}");
 
             if (message.Content?.Contains("hello", StringComparison.OrdinalIgnoreCase) == true)
             {
                 await message.Reply(content: $"Hello! I'm '{Name}' v{Version}.");
             }
+        });
+
+        // Register hook for group message events (needs GROUP_MESSAGE_CREATE intent)
+        context.Hooks.On(HookEvents.GroupMessageCreate, async (GroupMessage msg) =>
+        {
+            Logger.LogInfo($"[{Name}] Received group message from {msg.Author?.MemberOpenid}: {msg.Content}");
+
+            if (msg.Content?.Contains("ping", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                await msg.Reply(content: "pong!");
+            }
+        });
+
+        // Register hook for group member join events
+        context.Hooks.On(HookEvents.GroupMemberAdd, async (GroupManageEvent ev) =>
+        {
+            Logger.LogInfo($"[{Name}] New member joined group {ev.GroupOpenid}");
         });
 
         context.Hooks.On(HookEvents.Ready, () =>

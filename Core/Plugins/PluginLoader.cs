@@ -61,7 +61,7 @@ public class PluginLoader
     private async Task<LoadedPlugin?> LoadPluginFromAssemblyAsync(string assemblyPath, IPluginContext context)
     {
         var loadContext = new PluginLoadContext(assemblyPath);
-        var assembly = loadContext.LoadFromAssemblyPath(assemblyPath);
+        var assembly = loadContext.LoadPluginAssembly(assemblyPath);
 
         foreach (var type in assembly.GetExportedTypes())
         {
@@ -121,17 +121,48 @@ public class LoadedPlugin
 internal class PluginLoadContext : AssemblyLoadContext
 {
     private readonly AssemblyDependencyResolver _resolver;
+    private Assembly? _pluginAssembly;
 
     public PluginLoadContext(string pluginPath) : base(isCollectible: true)
     {
         _resolver = new AssemblyDependencyResolver(pluginPath);
     }
 
+    internal Assembly LoadPluginAssembly(string assemblyPath)
+    {
+        _pluginAssembly = LoadFromAssemblyPath(assemblyPath);
+        return _pluginAssembly;
+    }
+
     protected override Assembly? Load(AssemblyName assemblyName)
     {
+        // 1. Try the .deps.json resolver (for dependencies alongside the plugin)
         var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
         if (assemblyPath != null)
             return LoadFromAssemblyPath(assemblyPath);
+
+        // 2. Try to load from embedded resources (allows bundling deps inside the plugin DLL)
+        if (_pluginAssembly != null)
+        {
+            // Embedded resource naming: namespace + filename (e.g., "SamplePlugin.Newtonsoft.Json.dll")
+            var resourceNames = _pluginAssembly.GetManifestResourceNames();
+            var dllName = assemblyName.Name + ".dll";
+
+            foreach (var resourceName in resourceNames)
+            {
+                if (resourceName.EndsWith(dllName, StringComparison.OrdinalIgnoreCase))
+                {
+                    using var stream = _pluginAssembly.GetManifestResourceStream(resourceName);
+                    if (stream != null)
+                    {
+                        Logger.LogDebug($"[PluginLoader] Loading embedded assembly: {assemblyName.Name}");
+                        return LoadFromStream(stream);
+                    }
+                }
+            }
+        }
+
+        // 3. Fall through to default context (host-loaded assemblies like POPYBot.Core, System.*, etc.)
         return null;
     }
 
