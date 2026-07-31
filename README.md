@@ -180,12 +180,12 @@ public class HelloPlugin : IBotPlugin
 dotnet build -c Release
 ```
 
-编译后 `bin/Release/net10.0/` 下只有 **3 个文件**：
-- `HelloPlugin.dll` — 插件本体（仅此一个 DLL，含嵌入依赖）
-- `HelloPlugin.deps.json` — 依赖清单（调试用）
+编译后：
+- `HelloPlugin.dll` — 插件本体
+- `HelloPlugin.deps.json` — 依赖清单
 - `HelloPlugin.pdb` — 调试符号
 
-将 `HelloPlugin.dll` 复制到宿主程序的 `plugins/` 目录即可。宿主会自动扫描并加载。
+将 `HelloPlugin.dll` 复制到主程序的 `plugins/` 目录即可。宿主会自动扫描并加载。
 
 ---
 
@@ -478,15 +478,3 @@ Intents 控制机器人订阅哪些事件。在 `config.json` 中支持两种写
 | `Information` | 连接状态、插件加载、事件分发 |
 | `Warning` | 超时重试、配置警告 |
 | `Error` | 连接错误、异常堆栈 |
-
-### 生产部署
-
-```bash
-# 发布为独立可执行文件
-dotnet publish Console -c Release -r win-x64 --self-contained -o ./publish
-
-# 或在 Linux 上
-dotnet publish Console -c Release -r linux-x64 --self-contained -o ./publish
-```
-
-将 `publish/` 目录拷贝到服务器，配合 `config.json` 和 `plugins/` 目录运行即可。
