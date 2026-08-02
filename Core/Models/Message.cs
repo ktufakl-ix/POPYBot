@@ -15,6 +15,10 @@ public class Message
     public List<MessageUser> Mentions { get; }
     public List<Attachment> Attachments { get; }
     public int? Seq { get; }
+    public int? MsgSeq { get; }
+    public int? MessageType { get; }
+    public List<MsgElement>? MsgElements { get; }
+    public object? ArkData { get; }
     public string? SeqInChannel { get; }
     public string? Timestamp { get; }
     public string? EventId { get; }
@@ -33,6 +37,10 @@ public class Message
         Mentions = data.Mentions?.Select(m => new MessageUser(m)).ToList() ?? new();
         Attachments = data.Attachments?.Select(a => new Attachment(a)).ToList() ?? new();
         Seq = data.Seq;
+        MsgSeq = data.MsgSeq;
+        MessageType = data.MessageType;
+        MsgElements = data.MsgElements;
+        ArkData = data.ArkData?.Clone();
         SeqInChannel = data.SeqInChannel;
         Timestamp = data.Timestamp;
     }

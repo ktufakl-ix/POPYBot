@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AssemblyName>POPYBot.Console</AssemblyName>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,11 +22,9 @@
   <Target Name="CopyPlugins" AfterTargets="Build">
     <MakeDir Directories="$(OutputPath)plugins" Condition="!Exists('$(OutputPath)plugins')" />
     <ItemGroup>
-      <PluginFiles Include="..\Plugins\*\bin\$(Configuration)\net10.0\*.dll"
-                   Exclude="..\Plugins\*\bin\$(Configuration)\net10.0\POPYBot.Core.*" />
+      <PluginFiles Include="..\Plugins\*\bin\$(Configuration)\net10.0\*.dll" Exclude="..\Plugins\*\bin\$(Configuration)\net10.0\POPYBot.Core.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(OutputPath)plugins"
-          Condition="Exists('%(FullPath)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(OutputPath)plugins" Condition="Exists('%(FullPath)')" SkipUnchangedFiles="true" />
     <Message Text="[POPYBot] Copied @(PluginFiles-&gt;Count()) plugin DLL(s) to $(OutputPath)plugins" Importance="high" />
   </Target>
 

@@ -15,6 +15,10 @@ public class DirectMessage
     public MessageRef? MessageReference { get; }
     public List<Attachment> Attachments { get; }
     public int? Seq { get; }
+    public int? MsgSeq { get; }
+    public int? MessageType { get; }
+    public List<MsgElement>? MsgElements { get; }
+    public object? ArkData { get; }
     public string? SeqInChannel { get; }
     public string? SrcGuildId { get; }
     public string? Timestamp { get; }
@@ -34,6 +38,10 @@ public class DirectMessage
         MessageReference = data.MessageReference;
         Attachments = data.Attachments?.Select(a => new Attachment(a)).ToList() ?? new();
         Seq = data.Seq;
+        MsgSeq = data.MsgSeq;
+        MessageType = data.MessageType;
+        MsgElements = data.MsgElements;
+        ArkData = data.ArkData?.Clone();
         SeqInChannel = data.SeqInChannel;
         SrcGuildId = data.SrcGuildId;
         Timestamp = data.Timestamp;
@@ -82,6 +90,9 @@ public class GroupMessage
     public List<MessageUser> Mentions { get; }
     public List<Attachment> Attachments { get; }
     public int? MsgSeq { get; }
+    public int? MessageType { get; }
+    public List<MsgElement>? MsgElements { get; }
+    public object? ArkData { get; }
     public string? Timestamp { get; }
     public string? EventId { get; }
     public GroupMessageAuthor Author { get; }
@@ -96,6 +107,9 @@ public class GroupMessage
         Mentions = data.Mentions?.Select(m => new MessageUser(m)).ToList() ?? new();
         Attachments = data.Attachments?.Select(a => new Attachment(a)).ToList() ?? new();
         MsgSeq = data.MsgSeq;
+        MessageType = data.MessageType;
+        MsgElements = data.MsgElements;
+        ArkData = data.ArkData?.Clone();
         Timestamp = data.Timestamp;
         EventId = eventId;
         Author = new GroupMessageAuthor(data.Author ?? new GatewayUser());
@@ -135,6 +149,9 @@ public class C2CMessage
     public List<MessageUser> Mentions { get; }
     public List<Attachment> Attachments { get; }
     public int? MsgSeq { get; }
+    public int? MessageType { get; }
+    public List<MsgElement>? MsgElements { get; }
+    public object? ArkData { get; }
     public string? Timestamp { get; }
     public string? EventId { get; }
     public C2CMessageAuthor Author { get; }
@@ -148,6 +165,9 @@ public class C2CMessage
         Mentions = data.Mentions?.Select(m => new MessageUser(m)).ToList() ?? new();
         Attachments = data.Attachments?.Select(a => new Attachment(a)).ToList() ?? new();
         MsgSeq = data.MsgSeq;
+        MessageType = data.MessageType;
+        MsgElements = data.MsgElements;
+        ArkData = data.ArkData?.Clone();
         Timestamp = data.Timestamp;
         EventId = eventId;
         Author = new C2CMessageAuthor(data.Author ?? new GatewayUser());

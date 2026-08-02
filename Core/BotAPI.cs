@@ -87,7 +87,7 @@ public class BotAPI
     public async Task<object?> PostMessageAsync(string channelId, string msgId,
         string? content = null, string? image = null, object? embed = null, object? ark = null,
         object? messageReference = null, string? imageUrl = null, object? markdown = null, object? keyboard = null,
-        object? fileImage = null, string? eventId = null)
+        object? fileImage = null, string? eventId = null, int? msgSeq = null, int? msgType = null)
     {
         var payload = new Dictionary<string, object?>();
         if (content != null) payload["content"] = content;
@@ -100,6 +100,8 @@ public class BotAPI
         if (keyboard != null) payload["keyboard"] = keyboard;
         if (fileImage != null) payload["file_image"] = fileImage;
         if (eventId != null) payload["event_id"] = eventId;
+        if (msgSeq.HasValue) payload["msg_seq"] = msgSeq.Value;
+        if (msgType.HasValue) payload["msg_type"] = msgType.Value;
         if (msgId != "0") payload["msg_id"] = msgId;
 
         return await _http.RequestAsync<object>(new Route("POST", "/channels/{channel_id}/messages",
@@ -108,7 +110,8 @@ public class BotAPI
 
     public async Task<object?> PostDmsAsync(string guildId, string msgId,
         string? content = null, string? image = null, object? embed = null, object? ark = null,
-        object? messageReference = null, string? imageUrl = null, object? markdown = null, object? keyboard = null)
+        object? messageReference = null, string? imageUrl = null, object? markdown = null, object? keyboard = null,
+        int? msgSeq = null, int? msgType = null)
     {
         var payload = new Dictionary<string, object?>();
         if (content != null) payload["content"] = content;
@@ -119,6 +122,8 @@ public class BotAPI
         if (imageUrl != null) payload["image"] = imageUrl;
         if (markdown != null) payload["markdown"] = markdown;
         if (keyboard != null) payload["keyboard"] = keyboard;
+        if (msgSeq.HasValue) payload["msg_seq"] = msgSeq.Value;
+        if (msgType.HasValue) payload["msg_type"] = msgType.Value;
         if (msgId != "0") payload["msg_id"] = msgId;
 
         return await _http.RequestAsync<object>(new Route("POST", "/dms/{guild_id}/messages",
@@ -132,7 +137,8 @@ public class BotAPI
     // ===== Group / 群消息 =====
     public async Task<object?> PostGroupMessageAsync(string groupOpenid, string msgId,
         string? content = null, string? image = null, object? embed = null, object? ark = null,
-        object? messageReference = null, string? imageUrl = null, object? markdown = null, object? keyboard = null)
+        object? messageReference = null, string? imageUrl = null, object? markdown = null, object? keyboard = null,
+        int? msgSeq = null, int? msgType = null)
     {
         var payload = new Dictionary<string, object?>();
         if (content != null) payload["content"] = content;
@@ -143,6 +149,8 @@ public class BotAPI
         if (imageUrl != null) payload["image"] = imageUrl;
         if (markdown != null) payload["markdown"] = markdown;
         if (keyboard != null) payload["keyboard"] = keyboard;
+        if (msgSeq.HasValue) payload["msg_seq"] = msgSeq.Value;
+        if (msgType.HasValue) payload["msg_type"] = msgType.Value;
         if (msgId != "0") payload["msg_id"] = msgId;
 
         return await _http.RequestAsync<object>(new Route("POST", "/v2/groups/{group_openid}/messages",
@@ -152,7 +160,8 @@ public class BotAPI
     // ===== C2C / 单聊消息 =====
     public async Task<object?> PostC2CMessageAsync(string openid, string msgId,
         string? content = null, string? image = null, object? embed = null, object? ark = null,
-        object? messageReference = null, string? imageUrl = null, object? markdown = null, object? keyboard = null)
+        object? messageReference = null, string? imageUrl = null, object? markdown = null, object? keyboard = null,
+        int? msgSeq = null, int? msgType = null)
     {
         var payload = new Dictionary<string, object?>();
         if (content != null) payload["content"] = content;
@@ -163,6 +172,8 @@ public class BotAPI
         if (imageUrl != null) payload["image"] = imageUrl;
         if (markdown != null) payload["markdown"] = markdown;
         if (keyboard != null) payload["keyboard"] = keyboard;
+        if (msgSeq.HasValue) payload["msg_seq"] = msgSeq.Value;
+        if (msgType.HasValue) payload["msg_type"] = msgType.Value;
         if (msgId != "0") payload["msg_id"] = msgId;
 
         return await _http.RequestAsync<object>(new Route("POST", "/v2/users/{openid}/messages",
