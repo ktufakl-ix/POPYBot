@@ -1,6 +1,7 @@
 namespace POPYBot.Types;
 
 using System.Text.Json.Serialization;
+using System.Text.Json;
 
 public class WsUrlPayload
 {
@@ -97,6 +98,25 @@ public class MessagePayload
     [JsonPropertyName("attachments")]
     public List<MessageAttachment>? Attachments { get; set; }
 
+    // server-inter / callback fields
+    [JsonPropertyName("msg_type")]
+    public int? MsgType { get; set; }
+
+    [JsonPropertyName("msg_id")]
+    public string? MsgId { get; set; }
+
+    [JsonPropertyName("msg_seq")]
+    public int? MsgSeq { get; set; }
+
+    [JsonPropertyName("message_type")]
+    public int? MessageType { get; set; }
+
+    [JsonPropertyName("msg_elements")]
+    public List<MsgElement>? MsgElements { get; set; }
+
+    [JsonPropertyName("ark_data")]
+    public JsonElement? ArkData { get; set; }
+
     [JsonPropertyName("seq")]
     public int? Seq { get; set; }
 
@@ -162,6 +182,21 @@ public class MessageAttachment
 
     [JsonPropertyName("url")]
     public string? Url { get; set; }
+}
+
+public class MsgElement
+{
+    [JsonPropertyName("msg_type")]
+    public int? MsgType { get; set; }
+
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
+
+    [JsonPropertyName("attachments")]
+    public List<MessageAttachment>? Attachments { get; set; }
+
+    [JsonPropertyName("message_reference")]
+    public MessageRef? MessageReference { get; set; }
 }
 
 public class MessageAuditPayload

@@ -95,7 +95,7 @@ public class GroupMessage
         MessageReference = data.MessageReference;
         Mentions = data.Mentions?.Select(m => new MessageUser(m)).ToList() ?? new();
         Attachments = data.Attachments?.Select(a => new Attachment(a)).ToList() ?? new();
-        MsgSeq = data.Seq;
+        MsgSeq = data.MsgSeq;
         Timestamp = data.Timestamp;
         EventId = eventId;
         Author = new GroupMessageAuthor(data.Author ?? new GatewayUser());
@@ -147,7 +147,7 @@ public class C2CMessage
         MessageReference = data.MessageReference;
         Mentions = data.Mentions?.Select(m => new MessageUser(m)).ToList() ?? new();
         Attachments = data.Attachments?.Select(a => new Attachment(a)).ToList() ?? new();
-        MsgSeq = data.Seq;
+        MsgSeq = data.MsgSeq;
         Timestamp = data.Timestamp;
         EventId = eventId;
         Author = new C2CMessageAuthor(data.Author ?? new GatewayUser());

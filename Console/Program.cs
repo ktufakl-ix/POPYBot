@@ -64,9 +64,9 @@ static void PrintBanner()
 {
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine("╔══════════════════════════════════════╗");
-    Console.WriteLine("║        POPYBot - QQ Bot SDK          ║");
-    Console.WriteLine("║    Plugin-powered bot framework      ║");
-    Console.WriteLine("║        .NET 10   |   C# 13           ║");
+    Console.WriteLine("║                             POPYBot - QQ Bot SDK                           ║");
+    Console.WriteLine("║                         Plugin-powered bot framework                       ║");
+    Console.WriteLine("║                             .NET 10   |   C# 13                            ║");
     Console.WriteLine("╚══════════════════════════════════════╝");
     Console.ResetColor();
     Console.WriteLine();
