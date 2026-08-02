@@ -136,15 +136,18 @@ internal class PluginLoadContext : AssemblyLoadContext
 
     protected override Assembly? Load(AssemblyName assemblyName)
     {
-        // 1. Try the .deps.json resolver (for dependencies alongside the plugin)
-        var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
-        if (assemblyPath != null)
-            return LoadFromAssemblyPath(assemblyPath);
+        // 1. Check if assembly is already loaded in the default context (shared types like POPYBot.Core).
+        //    MUST come first, otherwise a stale copy alongside the plugin DLL would be loaded
+        //    into this isolated context, causing type-identity mismatch with the host.
+        foreach (var asm in Default.Assemblies)
+        {
+            if (string.Equals(asm.GetName().Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase))
+                return asm;
+        }
 
         // 2. Try to load from embedded resources (allows bundling deps inside the plugin DLL)
         if (_pluginAssembly != null)
         {
-            // Embedded resource naming: namespace + filename (e.g., "SamplePlugin.Newtonsoft.Json.dll")
             var resourceNames = _pluginAssembly.GetManifestResourceNames();
             var dllName = assemblyName.Name + ".dll";
 
@@ -162,7 +165,20 @@ internal class PluginLoadContext : AssemblyLoadContext
             }
         }
 
-        // 3. Fall through to default context (host-loaded assemblies like POPYBot.Core, System.*, etc.)
+        // 3. Try the .deps.json resolver (for private dependencies alongside the plugin)
+        var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+        if (assemblyPath != null)
+            return LoadFromAssemblyPath(assemblyPath);
+
+        // 4. Try loading from host's base directory (Console output, shared libs)
+        var hostAssemblyPath = Path.Combine(AppContext.BaseDirectory, assemblyName.Name + ".dll");
+        if (File.Exists(hostAssemblyPath))
+        {
+            Logger.LogDebug($"[PluginLoader] Loading shared assembly from host: {assemblyName.Name}");
+            return LoadFromAssemblyPath(hostAssemblyPath);
+        }
+
+        // 5. Fall through to default context (System.*, etc.)
         return null;
     }
 
